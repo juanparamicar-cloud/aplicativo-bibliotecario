@@ -1,0 +1,30 @@
+[
+{
+  "model": "biblioteca.libro",
+  "pk": 1,
+  "fields": {
+    "nombre": "Cien años de soledad",
+    "autor": "gabriel garcia marquez",
+    "editorial": "Sudamericana",
+    "tipo": "novela",
+    "anio_publicacion": 1967,
+    "isbn": "",
+    "descripcion": "",
+    "fecha_registro": "2026-11-07T03:01:09.727Z"
+  }
+},
+{
+  "model": "biblioteca.libro",
+  "pk": 2,
+  "fields": {
+    "nombre": "El llanto en lamas",
+    "autor": "Juan Rulfo",
+    "editorial": "FCE",
+    "tipo": "cuento",
+    "anio_publicacion": 1992,
+    "isbn": "",
+    "descripcion": "",
+    "fecha_registro": "2026-11-07T03:02:27.110Z"
+  }
+}
+]

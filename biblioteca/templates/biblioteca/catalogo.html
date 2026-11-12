@@ -1,0 +1,38 @@
+{% extends "biblioteca/base.html" %}
+
+{% block contenido %}
+<h1 class="h3 mb-4">Busca El libro Que mas te llame la Atencion </h1>
+
+<form method="get" class="d-flex gap-2 mb-4">
+  <select name="tipo" class="form-select w-auto">
+    <option value="">Todos los tipos</option>
+    {% for valor, texto in tipos %}
+    {% if valor == tipo_actual %}
+    <option value="{{ valor }}" selected>{{ texto }}</option>
+    {% else %}
+    <option value="{{ valor }}">{{ texto }}</option>
+    {% endif %}
+    {% endfor %}
+  </select>
+  <button type="submit" class="btn btn-primary">Filtrar</button>
+</form>
+
+<div class="list-group">
+  {% for libro in libros %}
+  <a href="{% url 'biblioteca:detalle' libro.id %}"
+    class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+    <div>
+      <div class="fw-semibold">{{ libro.nombre }}</div>
+      <small class="text-muted">{{ libro.autor }} · {{ libro.get_tipo_display }}</small>
+    </div>
+    {% if libro.promedio %}
+    <span class="badge text-bg-warning fs-6">⭐ {{ libro.promedio|floatformat:1 }}</span>
+    {% else %}
+    <span class="text-muted small">Sin reseñas</span>
+    {% endif %}
+  </a>
+  {% empty %}
+  <p class="text-muted">No hay libros de este tipo.</p>
+  {% endfor %}
+</div>
+{% endblock %}

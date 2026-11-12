@@ -1,0 +1,41 @@
+{% extends "biblioteca/base.html" %}
+
+{% block titulo %}{{ libro.nombre }} · Biblioteca Uninpahu{% endblock %}
+
+{% block contenido %}
+<a href="{% url 'biblioteca:catalogo' %}" class="btn btn-link px-0 mb-3">← Volver al catálogo</a>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <h1 class="h3 card-title">{{ libro.nombre }}</h1>
+    <p class="text-muted mb-2">{{ libro.autor }} · {{ libro.editorial }} · {{ libro.get_tipo_display }}</p>
+    {% if libro.descripcion %}<p>{{ libro.descripcion }}</p>{% endif %}
+
+    <div class="d-flex justify-content-between align-items-center mt-3">
+      {% if libro.promedio %}
+      <span class="fs-5">⭐ {{ libro.promedio|floatformat:1 }}
+        <small class="text-muted">({{ libro.total_resenas }} reseñas)</small></span>
+      {% else %}
+      <span class="text-muted">Sin reseñas todavía</span>
+      {% endif %}
+      <a href="{% url 'biblioteca:resenar' libro.id %}" class="btn btn-primary">Dejar una reseña</a>
+    </div>
+  </div>
+</div>
+
+<h2 class="h5 mb-3">Reseñas</h2>
+{% for resena in resenas %}
+<div class="card mb-2">
+  <div class="card-body py-2">
+    <div class="d-flex justify-content-between">
+      <strong>{{ resena.nombre }}</strong>
+      <span>⭐ {{ resena.puntuacion }}</span>
+    </div>
+    <p class="mb-1">{{ resena.comentario }}</p>
+    <small class="text-muted">{{ resena.fecha|date:"d/m/Y" }}</small>
+  </div>
+</div>
+{% empty %}
+<p class="text-muted">Aún no hay reseñas. ¡Sé el primero!</p>
+{% endfor %}
+{% endblock %}
