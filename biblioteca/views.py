@@ -2,6 +2,11 @@ from django.shortcuts import render ,get_object_or_404 , redirect
 from django.db.models import Avg, Count, Q
 from .forms import ResenaForm
 from .models import Libro,Resena
+# importaciones para funcionamient de el service de ia
+import json
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from .servicios_ia import obtener_recomendaciones
 
 def catalogo(request):
     libros = Libro.objects.order_by("nombre")
@@ -49,3 +54,19 @@ def resenar(request, libro_id):
         "form": form,
     }
     return render(request, "biblioteca/resenar.html", context)
+
+@require_POST
+def api_recomendaciones(request):
+    try:
+        datos = json.loads(request.body or "{}")
+    except json.JSONDecodeError:
+        datos = {}
+
+    gustos = str(datos.get("gustos", ""))[:300]
+    recomendaciones, fuente = obtener_recomendaciones(gustos)
+
+    return JsonResponse({"recomendaciones": recomendaciones, "fuente": fuente})
+
+
+def docs_api(request):
+    return render(request, "biblioteca/docs_api.html")

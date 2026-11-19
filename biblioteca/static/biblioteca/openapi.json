@@ -1,0 +1,80 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "API Biblioteca Uninpahu (Django)",
+    "version": "1.0.0",
+    "description": "Endpoint que usa la ventana del asistente en la vista del visitante. Django calcula los libros mejor calificados, consulta al microservicio de IA y devuelve hasta 3 recomendaciones. Requiere el token CSRF de Django (esta página lo agrega automáticamente)."
+  },
+  "tags": [{ "name": "Recomendaciones" }],
+  "paths": {
+    "/api/recomendaciones/": {
+      "post": {
+        "tags": ["Recomendaciones"],
+        "summary": "Obtiene recomendaciones de libros según su puntaje",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "gustos": { "type": "string", "maxLength": 300, "description": "Preferencias del visitante (opcional)" }
+                }
+              },
+              "example": { "gustos": "quiero algo de poesía" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Lista de recomendaciones. 'fuente' indica si salieron de la IA, del ranking por puntaje (plan B) o si no hay datos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "fuente": { "type": "string", "enum": ["ia", "puntaje", "sin_datos"] },
+                    "recomendaciones": {
+                      "type": "array",
+                      "maxItems": 3,
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "integer" },
+                          "nombre": { "type": "string" },
+                          "autor": { "type": "string" },
+                          "tipo": { "type": "string" },
+                          "promedio": { "type": "number" },
+                          "total_resenas": { "type": "integer" },
+                          "motivo": { "type": "string" },
+                          "url": { "type": "string" }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "fuente": "ia",
+                  "recomendaciones": [
+                    {
+                      "id": 1,
+                      "nombre": "Cien años de soledad",
+                      "autor": "Gabriel García Márquez",
+                      "tipo": "Novela",
+                      "promedio": 4.8,
+                      "total_resenas": 5,
+                      "motivo": "Los lectores la califican con 4.8 y destacan su narrativa mágica.",
+                      "url": "/libro/1/"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "403": { "description": "Falta el token CSRF o es inválido" },
+          "405": { "description": "Método no permitido (solo POST)" }
+        }
+      }
+    }
+  }
+}

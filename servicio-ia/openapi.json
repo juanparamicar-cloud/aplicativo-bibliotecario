@@ -1,0 +1,212 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Servicio de IA – Biblioteca Uninpahu",
+    "version": "1.0.0",
+    "description": "Microservicio Node.js (Express) que recibe desde Django los libros mejor calificados y devuelve hasta 3 recomendaciones redactadas con Gemini. Si el modelo principal falla, intenta con un modelo de respaldo; si ambos fallan, responde una lista vacía para que Django aplique el plan B por puntaje."
+  },
+  "tags": [
+    {
+      "name": "Monitoreo",
+      "description": "Estado del servicio"
+    },
+    {
+      "name": "Recomendaciones",
+      "description": "Generación de recomendaciones con IA"
+    }
+  ],
+  "paths": {
+    "/salud": {
+      "get": {
+        "tags": [
+          "Monitoreo"
+        ],
+        "summary": "Verifica que el servicio está activo",
+        "responses": {
+          "200": {
+            "description": "El servicio está activo",
+            "content": {
+              "application/json": {
+                "example": {
+                  "estado": "ok"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/recomendar": {
+      "post": {
+        "tags": [
+          "Recomendaciones"
+        ],
+        "summary": "Genera recomendaciones a partir de los libros mejor calificados",
+        "description": "Solo Django debe llamar este endpoint. Requiere el encabezado X-Servicio-Token cuando el servicio tiene configurada la variable SERVICIO_IA_TOKEN.",
+        "security": [
+          {
+            "tokenServicio": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SolicitudRecomendacion"
+              },
+              "example": {
+                "gustos": "algo de misterio corto",
+                "catalogo": [
+                  {
+                    "id": 1,
+                    "nombre": "Cien años de soledad",
+                    "autor": "Gabriel García Márquez",
+                    "tipo": "Novela",
+                    "promedio": 4.8,
+                    "total_resenas": 5,
+                    "comentarios": [
+                      "Una obra maestra",
+                      "Muy recomendado"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Recomendaciones generadas (puede ser una lista vacía si la IA no está disponible)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RespuestaRecomendacion"
+                },
+                "example": {
+                  "recomendaciones": [
+                    {
+                      "id": 1,
+                      "motivo": "Los lectores la califican con 4.8 y destacan su narrativa mágica."
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No se envió el catálogo",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Falta el catálogo de libros"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token de servicio inválido o ausente",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "No autorizado"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "tokenServicio": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Servicio-Token"
+      }
+    },
+    "schemas": {
+      "LibroCatalogo": {
+        "type": "object",
+        "required": [
+          "id",
+          "nombre",
+          "promedio"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "nombre": {
+            "type": "string"
+          },
+          "autor": {
+            "type": "string"
+          },
+          "tipo": {
+            "type": "string"
+          },
+          "promedio": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "total_resenas": {
+            "type": "integer"
+          },
+          "comentarios": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 3
+          }
+        }
+      },
+      "SolicitudRecomendacion": {
+        "type": "object",
+        "required": [
+          "catalogo"
+        ],
+        "properties": {
+          "gustos": {
+            "type": "string",
+            "maxLength": 300,
+            "description": "Preferencias escritas por el visitante (opcional)"
+          },
+          "catalogo": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LibroCatalogo"
+            },
+            "maxItems": 10
+          }
+        }
+      },
+      "Recomendacion": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "motivo": {
+            "type": "string"
+          }
+        }
+      },
+      "RespuestaRecomendacion": {
+        "type": "object",
+        "properties": {
+          "recomendaciones": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Recomendacion"
+            },
+            "maxItems": 3
+          }
+        }
+      }
+    }
+  }
+}

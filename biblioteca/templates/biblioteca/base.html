@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 
@@ -19,6 +20,32 @@
   <main class="container pb-5" style="max-width: 760px;">
     {% block contenido %}{% endblock %}
   </main>
+  <button type="button" class="btn btn-warning shadow rounded-pill position-fixed bottom-0 end-0 m-4"
+    data-bs-toggle="modal" data-bs-target="#modalRecomendador">
+    soy tu asistente de ia puedo recomendarte algo hoy ?
+  </button>
+
+  <div class="modal fade" id="modalRecomendador" tabindex="-1" data-url="{% url 'biblioteca:recomendaciones' %}">
+    <div class="modal-dialog modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">📚 Recomendados para ti</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="formRecomendador" class="d-flex gap-2 mb-3">
+            {% csrf_token %}
+            <input name="gustos" class="form-control" maxlength="300" placeholder="¿Qué te gustaría leer? (opcional)">
+            <button class="btn btn-primary">Buscar</button>
+          </form>
+          <div id="resultadosRecomendador"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{% static 'biblioteca/recomendador.js' %}"></script>
 </body>
 
 </html>

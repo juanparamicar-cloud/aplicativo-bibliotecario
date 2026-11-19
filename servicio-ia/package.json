@@ -1,0 +1,13 @@
+{
+  "name": "servicio-ia",
+  "version": "1.0.0",
+  "description": "Microservicio de recomendaciones con IA para la Biblioteca Uninpahu",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "swagger-ui-express": "^5.0.1"
+  }
+}

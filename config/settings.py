@@ -135,3 +135,7 @@ MAILERS = {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
+
+# servico de ia
+SERVICIO_IA_URL = os.environ.get("SERVICIO_IA_URL", "http://localhost:3000")
+SERVICIO_IA_TOKEN = os.environ.get("SERVICIO_IA_TOKEN", "")
